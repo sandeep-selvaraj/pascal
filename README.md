@@ -10,6 +10,8 @@ Pascal handles workspace scaffolding, dependency wiring, and UV workspace sync �
 
 **[Documentation](https://sandeep-selvaraj.github.io/pascal)** · [Installation](https://sandeep-selvaraj.github.io/pascal/installation/) · [Quickstart](https://sandeep-selvaraj.github.io/pascal/quickstart/) · [Commands](https://sandeep-selvaraj.github.io/pascal/commands/)
 
+> Heavily inspired by [Polylith](https://polylith.gitbook.io/polylith) — *packages* map to Polylith's components, *apps* to its bases, brought to the Python/UV ecosystem with a minimal footprint.
+
 ---
 
 ## Installation
@@ -182,8 +184,8 @@ pascal --version
 ### Serve docs locally
 
 ```bash
-pip install mkdocs-material
-mkdocs serve
+pip install zensical
+zensical serve
 ```
 ---
 
