@@ -75,7 +75,11 @@ fn print_list(ws: &Workspace, member_names: &[String]) {
                     .next()
                     .unwrap_or(d)
                     .replace('-', "_");
-                if member_names.contains(&name) { Some(name) } else { None }
+                if member_names.contains(&name) {
+                    Some(name)
+                } else {
+                    None
+                }
             })
             .collect();
 
@@ -87,7 +91,11 @@ fn print_list(ws: &Workspace, member_names: &[String]) {
                     .next()
                     .unwrap_or(d)
                     .replace('-', "_");
-                if !member_names.contains(&name) { Some(d.clone()) } else { None }
+                if !member_names.contains(&name) {
+                    Some(d.clone())
+                } else {
+                    None
+                }
             })
             .collect();
 
@@ -123,10 +131,7 @@ fn print_graph(
             Some(&i) => i,
             None => continue,
         };
-        let neighbors: Vec<String> = g
-            .neighbors(idx)
-            .map(|n| g[n].clone())
-            .collect();
+        let neighbors: Vec<String> = g.neighbors(idx).map(|n| g[n].clone()).collect();
 
         print!("  {}", brick.name.bold());
         if neighbors.is_empty() {

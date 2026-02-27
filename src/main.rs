@@ -50,7 +50,11 @@ fn main() -> Result<()> {
             commands::diff::run(since)?;
         }
 
-        Commands::Test { changed, name, extra } => {
+        Commands::Test {
+            changed,
+            name,
+            extra,
+        } => {
             commands::test::run(changed, name, &extra)?;
         }
 
