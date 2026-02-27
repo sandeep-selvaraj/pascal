@@ -127,8 +127,8 @@ pascal --version
 ## Serving docs locally
 
 ```bash
-pip install mkdocs-material
-mkdocs serve
+pip install zensical
+zensical serve
 # open http://127.0.0.1:8000
 ```
 
