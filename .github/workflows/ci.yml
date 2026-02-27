@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cmake (Windows — required by openssl-sys)
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install cmake (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Run tests
+        run: cargo test

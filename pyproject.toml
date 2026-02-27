@@ -1,0 +1,28 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "pascal-cli"
+version = "0.1.0"
+description = "Fast Python monorepo manager powered by Rust and UV"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+keywords = ["monorepo", "python", "cli", "uv", "workspace"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Build Tools",
+]
+
+[project.urls]
+Homepage = "https://github.com/sandeep-selvaraj/pascal"
+Repository = "https://github.com/sandeep-selvaraj/pascal"
+Issues = "https://github.com/sandeep-selvaraj/pascal/issues"
+
+[tool.maturin]
+bindings = "bin"

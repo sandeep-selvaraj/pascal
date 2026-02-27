@@ -1,0 +1,137 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write  # required for OIDC trusted publishing
+
+jobs:
+  # ── Linux wheels (manylinux) ───────────────────────────────────────────────
+  linux:
+    name: Build Linux (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist
+          manylinux: auto
+          before-script-linux: |
+            # cmake is required by openssl-sys on some manylinux images
+            if command -v yum &>/dev/null; then
+              yum install -y cmake
+            fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.target }}
+          path: dist/*.whl
+
+  # ── macOS x86_64 ──────────────────────────────────────────────────────────
+  macos-x86_64:
+    name: Build macOS x86_64
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x86_64
+          args: --release --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-x86_64
+          path: dist/*.whl
+
+  # ── macOS arm64 ───────────────────────────────────────────────────────────
+  macos-arm64:
+    name: Build macOS arm64
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: aarch64
+          args: --release --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-arm64
+          path: dist/*.whl
+
+  # ── Windows x86_64 ────────────────────────────────────────────────────────
+  windows:
+    name: Build Windows x86_64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cmake (required by openssl-sys)
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: x86_64
+          args: --release --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-x86_64
+          path: dist/*.whl
+
+  # ── Source distribution ───────────────────────────────────────────────────
+  sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-sdist
+          path: dist/*.tar.gz
+
+  # ── Publish ───────────────────────────────────────────────────────────────
+  publish:
+    name: Publish to PyPI + GitHub Release
+    runs-on: ubuntu-latest
+    needs: [linux, macos-x86_64, macos-arm64, windows, sdist]
+    environment: pypi  # configure trusted publishing in this environment on PyPI
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
+      - name: Publish to PyPI (OIDC trusted publishing)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
