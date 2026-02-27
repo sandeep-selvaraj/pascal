@@ -60,6 +60,16 @@ pascal test
 | **app** | A deployable entry-point under `apps/`. Has a `[project.scripts]` entry and may depend on workspace packages. |
 | **brick** | Internal term for any workspace member (package or app). |
 
+## Inspiration
+
+Pascal is heavily inspired by [Polylith](https://polylith.gitbook.io/polylith) — an architecture concept that encourages decomposing a system into small, focused, reusable *components* and *bases*, all living in a single repository.
+
+Polylith's core idea is that code should be organised around **what it does** (components) rather than **which service it belongs to** — making it easy to compose different combinations of components into deployable artifacts. Pascal brings this same philosophy to the Python ecosystem with a simpler surface area: *packages* map to Polylith's components, and *apps* map to its bases.
+
+Where Polylith is an opinionated full-stack architecture, pascal is deliberately minimal — it handles the scaffolding and dependency wiring and then gets out of the way, leaving the rest to UV and standard Python tooling.
+
+If you find the ideas here compelling, the [Polylith documentation](https://polylith.gitbook.io/polylith) and its [Python tooling](https://davidvujic.github.io/python-polylith-docs/) are well worth reading.
+
 ## Next steps
 
 - [Install pascal](installation.md)
