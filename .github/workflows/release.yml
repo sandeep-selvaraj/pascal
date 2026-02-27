@@ -29,7 +29,7 @@ jobs:
           before-script-linux: |
             # cmake + perl-IPC-Cmd are required by openssl-sys (vendored build)
             if command -v yum &>/dev/null; then
-              yum install -y cmake perl-IPC-Cmd
+              yum install -y cmake perl-IPC-Cmd perl-Time-Piece
             fi
 
       - uses: actions/upload-artifact@v4

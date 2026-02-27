@@ -27,13 +27,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install MkDocs Material
-        run: pip install mkdocs-material
+      - name: Install Zensical
+        run: pip install zensical
 
       - uses: actions/configure-pages@v4
 
       - name: Build docs
-        run: mkdocs build --strict
+        run: zensical build --strict
 
       - uses: actions/upload-pages-artifact@v3
         with:
