@@ -184,3 +184,151 @@ pub fn write_pyproject(path: &Path, pyproject: &PyProject) -> Result<()> {
     std::fs::write(path, content)?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{ProjectMeta, WorkspaceConfig};
+
+    fn make_brick(name: &str, kind: BrickKind) -> Brick {
+        Brick {
+            name: name.to_string(),
+            kind,
+            path: PathBuf::from(format!("/fake/{name}")),
+            pyproject: PyProject::default(),
+        }
+    }
+
+    fn make_workspace(packages: Vec<Brick>, apps: Vec<Brick>) -> Workspace {
+        Workspace {
+            root: PathBuf::from("/fake/root"),
+            config: PascalConfig {
+                workspace: WorkspaceConfig {
+                    name: "test-ws".to_string(),
+                    python: "3.12".to_string(),
+                    description: None,
+                    packages: None,
+                    apps: None,
+                },
+            },
+            packages,
+            apps,
+        }
+    }
+
+    // ── find_brick ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn find_brick_finds_package_by_name() {
+        let ws = make_workspace(vec![make_brick("cart", BrickKind::Package)], vec![]);
+        assert!(ws.find_brick("cart").is_some());
+    }
+
+    #[test]
+    fn find_brick_finds_app_by_name() {
+        let ws = make_workspace(vec![], vec![make_brick("api", BrickKind::App)]);
+        assert!(ws.find_brick("api").is_some());
+    }
+
+    #[test]
+    fn find_brick_returns_none_for_unknown() {
+        let ws = make_workspace(vec![make_brick("cart", BrickKind::Package)], vec![]);
+        assert!(ws.find_brick("nope").is_none());
+    }
+
+    // ── member_names ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn member_names_includes_packages_and_apps() {
+        let ws = make_workspace(
+            vec![
+                make_brick("cart", BrickKind::Package),
+                make_brick("auth", BrickKind::Package),
+            ],
+            vec![make_brick("api", BrickKind::App)],
+        );
+        let names = ws.member_names();
+        assert_eq!(names, vec!["cart", "auth", "api"]);
+    }
+
+    #[test]
+    fn member_names_empty_when_no_bricks() {
+        let ws = make_workspace(vec![], vec![]);
+        assert!(ws.member_names().is_empty());
+    }
+
+    // ── read_pyproject / write_pyproject ─────────────────────────────────────
+
+    #[test]
+    fn read_write_pyproject_roundtrip() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("pyproject.toml");
+
+        let mut pp = PyProject::default();
+        pp.project = Some(ProjectMeta {
+            name: "cart".to_string(),
+            version: Some("0.1.0".to_string()),
+            dependencies: vec!["httpx".to_string()],
+            ..Default::default()
+        });
+
+        write_pyproject(&path, &pp).unwrap();
+        let loaded = read_pyproject(&path).unwrap();
+
+        let proj = loaded.project.unwrap();
+        assert_eq!(proj.name, "cart");
+        assert_eq!(proj.version.as_deref(), Some("0.1.0"));
+        assert_eq!(proj.dependencies, vec!["httpx"]);
+    }
+
+    #[test]
+    fn read_pyproject_error_on_missing_file() {
+        let result = read_pyproject(Path::new("/nonexistent/pyproject.toml"));
+        assert!(result.is_err());
+    }
+
+    // ── load_from ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn load_from_auto_discovers_packages_and_apps() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+
+        // pascal.toml
+        std::fs::write(
+            root.join("pascal.toml"),
+            "[workspace]\nname = \"ws\"\npython = \"3.12\"\n",
+        )
+        .unwrap();
+
+        // packages/cart/pyproject.toml
+        let cart = root.join("packages").join("cart");
+        std::fs::create_dir_all(&cart).unwrap();
+        std::fs::write(cart.join("pyproject.toml"), "[project]\nname = \"cart\"\n").unwrap();
+
+        // apps/api/pyproject.toml
+        let api = root.join("apps").join("api");
+        std::fs::create_dir_all(&api).unwrap();
+        std::fs::write(api.join("pyproject.toml"), "[project]\nname = \"api\"\n").unwrap();
+
+        let ws = Workspace::load_from(root).unwrap();
+        assert_eq!(ws.packages.len(), 1);
+        assert_eq!(ws.packages[0].name, "cart");
+        assert_eq!(ws.apps.len(), 1);
+        assert_eq!(ws.apps[0].name, "api");
+    }
+
+    #[test]
+    fn load_from_returns_empty_vecs_when_no_subdirs() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("pascal.toml"),
+            "[workspace]\nname = \"ws\"\npython = \"3.12\"\n",
+        )
+        .unwrap();
+
+        let ws = Workspace::load_from(dir.path()).unwrap();
+        assert!(ws.packages.is_empty());
+        assert!(ws.apps.is_empty());
+    }
+}
