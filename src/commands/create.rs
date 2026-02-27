@@ -103,3 +103,45 @@ fn validate_name(name: &str) -> Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_name_accepts_simple_name() {
+        assert!(validate_name("cart").is_ok());
+    }
+
+    #[test]
+    fn validate_name_accepts_hyphens_and_underscores() {
+        assert!(validate_name("my-pkg").is_ok());
+        assert!(validate_name("my_pkg").is_ok());
+        assert!(validate_name("my-pkg_v2").is_ok());
+    }
+
+    #[test]
+    fn validate_name_accepts_digits() {
+        assert!(validate_name("pkg2").is_ok());
+    }
+
+    #[test]
+    fn validate_name_rejects_empty() {
+        assert!(validate_name("").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_spaces() {
+        assert!(validate_name("my pkg").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_dots() {
+        assert!(validate_name("my.pkg").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_slashes() {
+        assert!(validate_name("a/b").is_err());
+    }
+}
