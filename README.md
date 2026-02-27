@@ -49,6 +49,63 @@ pascal test
 
 ---
 
+## Workspace layout
+
+After the quickstart above, your workspace looks like this:
+
+```
+shop/
+  pascal.toml          # workspace manifest
+  pyproject.toml       # UV workspace root — managed by pascal
+  uv.lock              # lockfile — commit to git
+  packages/
+    cart/
+      pyproject.toml
+      src/cart/__init__.py
+      tests/test_cart.py
+  apps/
+    storefront/
+      pyproject.toml   # depends on cart
+      src/storefront/__init__.py
+      src/storefront/main.py
+      tests/test_storefront.py
+```
+
+**`pascal.toml`**
+
+```toml
+[workspace]
+name = "shop"
+python = "3.12"
+description = "My Python monorepo"
+
+# Optional — pascal auto-discovers from packages/ and apps/ if omitted
+packages = ["packages/cart"]
+apps     = ["apps/storefront"]
+```
+
+**`apps/storefront/pyproject.toml`** (after `pascal add cart --to storefront`)
+
+```toml
+[project]
+name = "storefront"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["cart"]
+
+[project.scripts]
+storefront = "storefront.main:main"
+
+[tool.uv.sources]
+cart = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+```
+
+---
+
 ## Command reference
 
 | Command | Description |
@@ -128,28 +185,6 @@ pascal --version
 pip install mkdocs-material
 mkdocs serve
 ```
-
-### Project layout
-
-```
-src/
-  main.rs          # CLI entry-point
-  cli.rs           # clap argument structs
-  config.rs        # serde types (pascal.toml, pyproject.toml)
-  workspace.rs     # workspace discovery and loading
-  template.rs      # generated file content
-  display.rs       # coloured output helpers
-  uv.rs            # uv subprocess wrappers
-  git.rs           # git2 helpers
-  commands/        # one module per subcommand
-tests/
-  integration.rs   # end-to-end CLI tests
-docs/              # MkDocs source (mkdocs.yml at root)
-.github/workflows/
-  ci.yml           # test on push / PR
-  release.yml      # publish to PyPI on git tag
-```
-
 ---
 
 ## License
