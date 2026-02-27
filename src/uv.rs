@@ -32,7 +32,12 @@ pub fn capture_uv(args: &[&str], cwd: &Path) -> Result<String> {
 }
 
 /// `uv run --project <dir> <entry_point> [extra_args]`
-pub fn uv_run(project_dir: &Path, entry: &str, extra: &[String], workspace_root: &Path) -> Result<ExitStatus> {
+pub fn uv_run(
+    project_dir: &Path,
+    entry: &str,
+    extra: &[String],
+    workspace_root: &Path,
+) -> Result<ExitStatus> {
     let mut args: Vec<String> = vec![
         "run".into(),
         "--project".into(),

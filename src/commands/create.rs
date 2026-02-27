@@ -59,9 +59,7 @@ fn scaffold_brick(dir: &Path, name: &str, python: &str, is_app: bool) -> Result<
     std::fs::create_dir_all(&src_pkg)?;
     std::fs::create_dir_all(&tests_dir)?;
 
-    let rel = |path: &Path| -> String {
-        path.to_string_lossy().into_owned()
-    };
+    let rel = |path: &Path| -> String { path.to_string_lossy().into_owned() };
 
     // pyproject.toml
     let pyproject_content = if is_app {
@@ -94,7 +92,9 @@ fn scaffold_brick(dir: &Path, name: &str, python: &str, is_app: bool) -> Result<
 }
 
 fn validate_name(name: &str) -> Result<()> {
-    let valid = name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    let valid = name
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
     if !valid || name.is_empty() {
         bail!(
             "Invalid name '{}': must contain only lowercase letters, digits, underscores, or hyphens",

@@ -12,8 +12,8 @@ pub struct Brick {
     pub name: String,
     #[allow(dead_code)]
     pub kind: BrickKind,
-    pub path: PathBuf,         // absolute path to the brick directory
-    pub pyproject: PyProject,  // parsed pyproject.toml
+    pub path: PathBuf,        // absolute path to the brick directory
+    pub pyproject: PyProject, // parsed pyproject.toml
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -59,17 +59,29 @@ impl Workspace {
         let packages = discover_bricks(root, BrickKind::Package, &config)?;
         let apps = discover_bricks(root, BrickKind::App, &config)?;
 
-        Ok(Workspace { root: root.to_path_buf(), config, packages, apps })
+        Ok(Workspace {
+            root: root.to_path_buf(),
+            config,
+            packages,
+            apps,
+        })
     }
 
     /// Find a brick by name (searches both packages and apps)
     pub fn find_brick(&self, name: &str) -> Option<&Brick> {
-        self.packages.iter().chain(self.apps.iter()).find(|b| b.name == name)
+        self.packages
+            .iter()
+            .chain(self.apps.iter())
+            .find(|b| b.name == name)
     }
 
     /// All workspace member names
     pub fn member_names(&self) -> Vec<String> {
-        self.packages.iter().chain(self.apps.iter()).map(|b| b.name.clone()).collect()
+        self.packages
+            .iter()
+            .chain(self.apps.iter())
+            .map(|b| b.name.clone())
+            .collect()
     }
 }
 
@@ -95,12 +107,16 @@ fn discover_bricks(root: &Path, kind: BrickKind, config: &PascalConfig) -> Resul
 
     // Use explicit list if provided, otherwise auto-discover
     let explicit_paths: Option<Vec<PathBuf>> = match &kind {
-        BrickKind::Package => config.workspace.packages.as_ref().map(|ps| {
-            ps.iter().map(|p| root.join(p)).collect()
-        }),
-        BrickKind::App => config.workspace.apps.as_ref().map(|ps| {
-            ps.iter().map(|p| root.join(p)).collect()
-        }),
+        BrickKind::Package => config
+            .workspace
+            .packages
+            .as_ref()
+            .map(|ps| ps.iter().map(|p| root.join(p)).collect()),
+        BrickKind::App => config
+            .workspace
+            .apps
+            .as_ref()
+            .map(|ps| ps.iter().map(|p| root.join(p)).collect()),
     };
 
     let dirs: Vec<PathBuf> = if let Some(paths) = explicit_paths {
@@ -138,10 +154,18 @@ fn discover_bricks(root: &Path, kind: BrickKind, config: &PascalConfig) -> Resul
             .as_ref()
             .map(|p| p.name.replace('-', "_"))
             .unwrap_or_else(|| {
-                dir.file_name().unwrap_or_default().to_string_lossy().into_owned()
+                dir.file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .into_owned()
             });
 
-        bricks.push(Brick { name, kind: kind.clone(), path: dir, pyproject });
+        bricks.push(Brick {
+            name,
+            kind: kind.clone(),
+            path: dir,
+            pyproject,
+        });
     }
 
     Ok(bricks)
@@ -151,8 +175,7 @@ fn discover_bricks(root: &Path, kind: BrickKind, config: &PascalConfig) -> Resul
 pub fn read_pyproject(path: &Path) -> Result<PyProject> {
     let content = std::fs::read_to_string(path)
         .with_context(|| format!("Failed to read {}", path.display()))?;
-    toml::from_str(&content)
-        .with_context(|| format!("Failed to parse {}", path.display()))
+    toml::from_str(&content).with_context(|| format!("Failed to parse {}", path.display()))
 }
 
 /// Write a pyproject.toml (serialized from struct)

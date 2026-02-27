@@ -37,14 +37,18 @@ pub fn run(since: Option<String>) -> Result<()> {
 
     for brick in &all_bricks {
         // Check if any changed file belongs to this brick
-        let brick_rel = ws.root.join("packages")
+        let brick_rel = ws
+            .root
+            .join("packages")
             .join(&brick.name)
             .strip_prefix(&ws.root)
             .unwrap_or_else(|_| std::path::Path::new(""))
             .to_string_lossy()
             .into_owned();
 
-        let brick_rel_app = ws.root.join("apps")
+        let brick_rel_app = ws
+            .root
+            .join("apps")
             .join(&brick.name)
             .strip_prefix(&ws.root)
             .unwrap_or_else(|_| std::path::Path::new(""))
@@ -52,7 +56,8 @@ pub fn run(since: Option<String>) -> Result<()> {
             .into_owned();
 
         // Also compute relative path of the brick from root
-        let brick_path_rel = brick.path
+        let brick_path_rel = brick
+            .path
             .strip_prefix(&ws.root)
             .unwrap_or(&brick.path)
             .to_string_lossy()
@@ -76,35 +81,53 @@ pub fn run(since: Option<String>) -> Result<()> {
 
     println!("  {} Changed bricks:", "◈".bright_blue());
     for name in &changed_bricks {
-        let kind = if ws.packages.iter().any(|b| &b.name == name) { "package" } else { "app" };
-        println!("    {} {}  {}", "◆".yellow(), name.bold(), format!("[{kind}]").dimmed());
+        let kind = if ws.packages.iter().any(|b| &b.name == name) {
+            "package"
+        } else {
+            "app"
+        };
+        println!(
+            "    {} {}  {}",
+            "◆".yellow(),
+            name.bold(),
+            format!("[{kind}]").dimmed()
+        );
     }
 
     // Find apps that depend on changed packages
-    let affected_apps: Vec<&Brick> = ws.apps.iter().filter(|app| {
-        let deps = app
-            .pyproject
-            .project
-            .as_ref()
-            .map(|p| p.dependencies.clone())
-            .unwrap_or_default();
+    let affected_apps: Vec<&Brick> = ws
+        .apps
+        .iter()
+        .filter(|app| {
+            let deps = app
+                .pyproject
+                .project
+                .as_ref()
+                .map(|p| p.dependencies.clone())
+                .unwrap_or_default();
 
-        deps.iter().any(|d| {
-            let name = d
-                .split(['>', '<', '=', '[', ';', ' '])
-                .next()
-                .unwrap_or(d)
-                .replace('-', "_");
-            changed_bricks.contains(&name)
+            deps.iter().any(|d| {
+                let name = d
+                    .split(['>', '<', '=', '[', ';', ' '])
+                    .next()
+                    .unwrap_or(d)
+                    .replace('-', "_");
+                changed_bricks.contains(&name)
+            })
         })
-    }).collect();
+        .collect();
 
     if !affected_apps.is_empty() {
         println!();
         println!("  {} Apps affected by changed packages:", "◈".bright_blue());
         for app in &affected_apps {
             if !changed_bricks.contains(&app.name) {
-                println!("    {} {}  {}", "▶".cyan(), app.name.bold(), "[app — transitive]".dimmed());
+                println!(
+                    "    {} {}  {}",
+                    "▶".cyan(),
+                    app.name.bold(),
+                    "[app — transitive]".dimmed()
+                );
             }
         }
     }
