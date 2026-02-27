@@ -1,0 +1,22 @@
+[package]
+name = "pascal"
+version = "0.1.0"
+edition = "2021"
+description = "A CLI tool for managing Python monorepos"
+license = "MIT"
+
+[[bin]]
+name = "pascal"
+path = "src/main.rs"
+
+[dependencies]
+clap       = { version = "4", features = ["derive", "cargo"] }
+serde      = { version = "1", features = ["derive"] }
+toml       = "0.8"
+anyhow     = "1"
+colored    = "2"
+walkdir    = "2"
+petgraph   = "0.6"
+git2       = { version = "0.19", default-features = false, features = ["vendored-openssl"] }
+indexmap   = { version = "2", features = ["serde"] }
+thiserror  = "1"
