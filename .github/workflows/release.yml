@@ -124,22 +124,16 @@ jobs:
           fetch-depth: 0   # git-cliff needs full history to build the changelog
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate changelog for this release (release body)
-        uses: orhun/git-cliff-action@v3
-        id: cliff_body
+      - name: Install git-cliff
+        uses: taiki-e/install-action@v2
         with:
-          config: cliff.toml
-          args: --current --strip all
-        env:
-          OUTPUT: body.md
+          tool: git-cliff
+
+      - name: Generate changelog for this release (release body)
+        run: git cliff --config cliff.toml --current --strip all > body.md
 
       - name: Regenerate full CHANGELOG.md
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --output CHANGELOG.md
-        env:
-          OUTPUT: CHANGELOG.md
+        run: git cliff --config cliff.toml --output CHANGELOG.md
 
       - name: Commit updated CHANGELOG.md
         run: |
