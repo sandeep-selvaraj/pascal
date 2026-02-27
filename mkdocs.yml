@@ -1,0 +1,90 @@
+site_name: pascal
+site_description: Fast Python monorepo manager powered by Rust and UV
+site_url: https://sandeep-selvaraj.github.io/pascal
+repo_url: https://github.com/sandeep-selvaraj/pascal
+repo_name: sandeep-selvaraj/pascal
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/package-variant-closed
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/sandeep-selvaraj/pascal
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quickstart: quickstart.md
+  - Workspace: workspace.md
+  - Commands:
+    - commands/index.md
+    - init: commands/init.md
+    - create: commands/create.md
+    - add: commands/add.md
+    - info: commands/info.md
+    - deps: commands/deps.md
+    - check: commands/check.md
+    - diff: commands/diff.md
+    - test: commands/test.md
+    - build: commands/build.md
+    - run: commands/run.md
+    - sync: commands/sync.md
+  - UV Integration: uv-integration.md
+  - CI/CD: ci-cd.md
+  - Contributing: contributing.md
