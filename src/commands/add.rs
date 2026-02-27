@@ -1,7 +1,7 @@
 use anyhow::{bail, Result};
 use indexmap::IndexMap;
 
-use crate::config::{UvSource, UvToolConfig, ToolConfig};
+use crate::config::{ToolConfig, UvSource, UvToolConfig};
 use crate::display;
 use crate::workspace::{read_pyproject, write_pyproject, Workspace};
 
@@ -17,7 +17,11 @@ pub fn run(package: &str, to: &str) -> Result<()> {
             anyhow::anyhow!(
                 "Package '{}' not found in workspace. Available: {}",
                 package,
-                ws.packages.iter().map(|b| b.name.as_str()).collect::<Vec<_>>().join(", ")
+                ws.packages
+                    .iter()
+                    .map(|b| b.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )
         })?;
 
@@ -41,7 +45,11 @@ pub fn run(package: &str, to: &str) -> Result<()> {
 
     // Check if dependency already present
     if let Some(project) = &pyproject.project {
-        if project.dependencies.iter().any(|d| d.starts_with(&dep_name)) {
+        if project
+            .dependencies
+            .iter()
+            .any(|d| d.starts_with(&dep_name))
+        {
             display::warning(&format!(
                 "'{}' is already a dependency of '{}'",
                 dep_name, to
@@ -68,10 +76,7 @@ pub fn run(package: &str, to: &str) -> Result<()> {
 
     display::modified(&pyproject_path.to_string_lossy());
     println!();
-    display::success(&format!(
-        "Added '{}' as a dependency of '{}'",
-        dep_name, to
-    ));
+    display::success(&format!("Added '{}' as a dependency of '{}'", dep_name, to));
     println!("  Run `pascal sync` to update the UV lockfile.");
 
     Ok(())

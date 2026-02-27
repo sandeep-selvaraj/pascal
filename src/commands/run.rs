@@ -15,7 +15,11 @@ pub fn run(app_name: &str, extra: &[String]) -> Result<()> {
             anyhow::anyhow!(
                 "App '{}' not found. Available apps: {}",
                 app_name,
-                ws.apps.iter().map(|a| a.name.as_str()).collect::<Vec<_>>().join(", ")
+                ws.apps
+                    .iter()
+                    .map(|a| a.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )
         })?;
 
