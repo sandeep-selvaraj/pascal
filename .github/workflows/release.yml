@@ -27,9 +27,9 @@ jobs:
           args: --release --out dist
           manylinux: auto
           before-script-linux: |
-            # cmake is required by openssl-sys on some manylinux images
+            # cmake + perl-IPC-Cmd are required by openssl-sys (vendored build)
             if command -v yum &>/dev/null; then
-              yum install -y cmake
+              yum install -y cmake perl-IPC-Cmd
             fi
 
       - uses: actions/upload-artifact@v4
