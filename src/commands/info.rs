@@ -21,7 +21,11 @@ pub fn run() -> Result<()> {
 
     // Packages
     println!();
-    println!("  {} ({})", "Packages".bold().bright_blue(), ws.packages.len());
+    println!(
+        "  {} ({})",
+        "Packages".bold().bright_blue(),
+        ws.packages.len()
+    );
     if ws.packages.is_empty() {
         println!("    {}", "(none)".dimmed());
     } else {
@@ -38,12 +42,7 @@ pub fn run() -> Result<()> {
                 .as_ref()
                 .map(|p| p.dependencies.len())
                 .unwrap_or(0);
-            display::tree_item(
-                1,
-                "◆",
-                &pkg.name,
-                &format!("v{version}  {dep_count} deps"),
-            );
+            display::tree_item(1, "◆", &pkg.name, &format!("v{version}  {dep_count} deps"));
         }
     }
 

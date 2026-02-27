@@ -10,7 +10,13 @@ pub fn section_header(title: &str) {
     let right = padding - left;
     println!(
         "{}",
-        format!("│ {}{}{} │", " ".repeat(left), title.bold(), " ".repeat(right)).bright_blue()
+        format!(
+            "│ {}{}{} │",
+            " ".repeat(left),
+            title.bold(),
+            " ".repeat(right)
+        )
+        .bright_blue()
     );
     println!("{}", format!("└{}┘", line).bright_blue());
 }

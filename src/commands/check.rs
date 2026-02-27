@@ -43,7 +43,9 @@ pub fn run() -> Result<()> {
                 .replace('-', "_");
 
             if member_names.contains(&dep_norm) {
-                if let (Some(&src), Some(&dst)) = (node_map.get(&brick.name), node_map.get(&dep_norm)) {
+                if let (Some(&src), Some(&dst)) =
+                    (node_map.get(&brick.name), node_map.get(&dep_norm))
+                {
                     g.add_edge(src, dst, ());
                 }
             }
@@ -83,7 +85,9 @@ pub fn run() -> Result<()> {
 
             if member_names.contains(&dep_norm) {
                 let in_sources = sources
-                    .map(|s| s.contains_key(&dep_norm) || s.contains_key(&dep_norm.replace('_', "-")))
+                    .map(|s| {
+                        s.contains_key(&dep_norm) || s.contains_key(&dep_norm.replace('_', "-"))
+                    })
                     .unwrap_or(false);
 
                 if !in_sources {

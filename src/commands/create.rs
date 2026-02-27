@@ -59,9 +59,7 @@ fn scaffold_brick(dir: &Path, name: &str, python: &str, is_app: bool) -> Result<
     std::fs::create_dir_all(&src_pkg)?;
     std::fs::create_dir_all(&tests_dir)?;
 
-    let rel = |path: &Path| -> String {
-        path.to_string_lossy().into_owned()
-    };
+    let rel = |path: &Path| -> String { path.to_string_lossy().into_owned() };
 
     // pyproject.toml
     let pyproject_content = if is_app {
@@ -94,7 +92,9 @@ fn scaffold_brick(dir: &Path, name: &str, python: &str, is_app: bool) -> Result<
 }
 
 fn validate_name(name: &str) -> Result<()> {
-    let valid = name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    let valid = name
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
     if !valid || name.is_empty() {
         bail!(
             "Invalid name '{}': must contain only lowercase letters, digits, underscores, or hyphens",
@@ -102,4 +102,46 @@ fn validate_name(name: &str) -> Result<()> {
         );
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_name_accepts_simple_name() {
+        assert!(validate_name("cart").is_ok());
+    }
+
+    #[test]
+    fn validate_name_accepts_hyphens_and_underscores() {
+        assert!(validate_name("my-pkg").is_ok());
+        assert!(validate_name("my_pkg").is_ok());
+        assert!(validate_name("my-pkg_v2").is_ok());
+    }
+
+    #[test]
+    fn validate_name_accepts_digits() {
+        assert!(validate_name("pkg2").is_ok());
+    }
+
+    #[test]
+    fn validate_name_rejects_empty() {
+        assert!(validate_name("").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_spaces() {
+        assert!(validate_name("my pkg").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_dots() {
+        assert!(validate_name("my.pkg").is_err());
+    }
+
+    #[test]
+    fn validate_name_rejects_slashes() {
+        assert!(validate_name("a/b").is_err());
+    }
 }
