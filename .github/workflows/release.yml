@@ -37,10 +37,10 @@ jobs:
           name: wheels-linux-${{ matrix.target }}
           path: dist/*.whl
 
-  # ── macOS x86_64 ──────────────────────────────────────────────────────────
+  # ── macOS x86_64 (cross-compiled from arm64 runner) ──────────────────────
   macos-x86_64:
     name: Build macOS x86_64
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
