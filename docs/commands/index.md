@@ -20,6 +20,8 @@ Run `pascal --help` or `pascal <command> --help` for built-in help text.
 | [`pascal build`](build.md) | Build an app wheel |
 | [`pascal run`](run.md) | Run an app entry-point |
 | [`pascal sync`](sync.md) | Regenerate UV workspace config |
+| [`pascal docker build`](docker.md) | Build a Docker image for an app |
+| [`pascal docker push`](docker.md) | Push a Docker image for an app |
 
 ## Global behaviour
 

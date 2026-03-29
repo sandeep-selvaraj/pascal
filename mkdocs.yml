@@ -86,6 +86,7 @@ nav:
     - build: commands/build.md
     - run: commands/run.md
     - sync: commands/sync.md
+    - docker: commands/docker.md
   - UV Integration: uv-integration.md
   - CI/CD: ci-cd.md
   - Contributing: contributing.md
