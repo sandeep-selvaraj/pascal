@@ -11,7 +11,7 @@ mod workspace;
 use anyhow::Result;
 use clap::Parser;
 
-use cli::{Cli, Commands, CreateKind};
+use cli::{Cli, Commands, CreateKind, DockerAction};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -69,6 +69,20 @@ fn main() -> Result<()> {
         Commands::Sync => {
             commands::sync::run()?;
         }
+
+        Commands::Docker { action } => match action {
+            DockerAction::Build {
+                app,
+                tag,
+                push,
+                platform,
+            } => {
+                commands::docker::build(&app, tag.as_deref(), push, &platform)?;
+            }
+            DockerAction::Push { app, tag } => {
+                commands::docker::push(&app, tag.as_deref())?;
+            }
+        },
     }
 
     Ok(())

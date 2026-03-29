@@ -82,6 +82,40 @@ pub fn test_stub_py(name: &str) -> String {
     )
 }
 
+/// Scaffold a Dockerfile for an app.
+/// `dep_names` are the workspace package names the app depends on.
+pub fn dockerfile(app_name: &str, python: &str, dep_names: &[&str]) -> String {
+    let normalized = app_name.replace('_', "-");
+
+    let copy_deps: String = dep_names
+        .iter()
+        .map(|name| format!("COPY packages/{name} packages/{name}\n"))
+        .collect();
+
+    format!(
+        r#"FROM python:{python}-slim
+
+# Bring in the uv binary from the official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+# Workspace packages this app depends on
+{copy_deps}
+# The app itself
+COPY apps/{app_name} apps/{app_name}
+
+# UV workspace config
+COPY pyproject.toml uv.lock* ./
+
+# Install dependencies (no dev extras, frozen lockfile)
+RUN uv sync --frozen --no-dev --project apps/{app_name}
+
+CMD ["uv", "run", "--project", "apps/{app_name}", "{normalized}"]
+"#
+    )
+}
+
 pub fn root_pyproject(workspace_name: &str, python: &str) -> String {
     format!(
         r#"[project]

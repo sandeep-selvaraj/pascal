@@ -209,6 +209,7 @@ mod tests {
                     description: None,
                     packages: None,
                     apps: None,
+                    docker: None,
                 },
             },
             packages,

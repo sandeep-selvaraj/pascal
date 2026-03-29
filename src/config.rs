@@ -17,6 +17,15 @@ pub struct WorkspaceConfig {
     pub packages: Option<Vec<String>>,
     #[serde(default)]
     pub apps: Option<Vec<String>>,
+    #[serde(default)]
+    pub docker: Option<DockerWorkspaceConfig>,
+}
+
+/// Workspace-level Docker config in pascal.toml under [workspace.docker]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct DockerWorkspaceConfig {
+    /// Default registry prefix, e.g. "ghcr.io/myorg"
+    pub registry: Option<String>,
 }
 
 /// Minimal pyproject.toml representation
@@ -48,6 +57,25 @@ pub struct ProjectMeta {
 pub struct ToolConfig {
     #[serde(default)]
     pub uv: Option<UvToolConfig>,
+    #[serde(default)]
+    pub pascal: Option<PascalToolConfig>,
+}
+
+/// Per-app pascal config in pyproject.toml under [tool.pascal]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct PascalToolConfig {
+    #[serde(default)]
+    pub docker: Option<DockerAppConfig>,
+}
+
+/// Per-app Docker overrides in pyproject.toml under [tool.pascal.docker]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct DockerAppConfig {
+    /// Override registry for this app, e.g. "ghcr.io/myorg/myapp"
+    pub registry: Option<String>,
+    /// Target platforms, e.g. ["linux/amd64", "linux/arm64"]
+    #[serde(default)]
+    pub platforms: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

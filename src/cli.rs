@@ -87,6 +87,43 @@ pub enum Commands {
 
     /// Regenerate root pyproject.toml and uv workspace config
     Sync,
+
+    /// Build or push Docker images for apps
+    Docker {
+        #[command(subcommand)]
+        action: DockerAction,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum DockerAction {
+    /// Build a Docker image for an app
+    Build {
+        /// Name of the app to build an image for
+        app: String,
+
+        /// Override the computed image tag (e.g. myorg/myapp:latest)
+        #[arg(long)]
+        tag: Option<String>,
+
+        /// Push the image after a successful build
+        #[arg(long)]
+        push: bool,
+
+        /// Target platform(s), e.g. linux/amd64,linux/arm64
+        #[arg(long, value_delimiter = ',')]
+        platform: Vec<String>,
+    },
+
+    /// Push a previously built Docker image for an app
+    Push {
+        /// Name of the app to push
+        app: String,
+
+        /// Override the computed image tag
+        #[arg(long)]
+        tag: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]

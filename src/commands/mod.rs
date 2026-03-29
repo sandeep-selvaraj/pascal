@@ -4,6 +4,7 @@ pub mod check;
 pub mod create;
 pub mod deps;
 pub mod diff;
+pub mod docker;
 pub mod info;
 pub mod init;
 pub mod run;
